@@ -22,12 +22,8 @@ Socket::Socket(std::string ip,int port){
     int rc = ::connect(_socket, (struct sockaddr*)&_address, len);
     if(rc == -1)
         throw SocketException("cant connect to ip:port");
-    else
-        std::cout << "[system connected to " << ip << " Port " << port << "]" <<  std::endl;
     
 }
-
-
 
 Socket::Socket(int Socket){
     _socket = Socket;
@@ -39,9 +35,10 @@ void Socket::send(std::string msg){
     size_t t;
     msg +="]]]"; //append end of message
     t = write(_socket, msg.c_str(), msg.length());
-    if( t == -1 || t == 0){
-        throw SocketException("[system send error][Server disconnected]");
-    }
+    if(t == -1)
+        throw SocketException("[send error: client disconnected]");
+    else
+        std::cout << "[MESSAGE SENT:] " << msg << std::endl;
 }
 
 void Socket::close(){
@@ -55,12 +52,11 @@ std::string Socket::recv(){
     
     do{ // while not end of message
         block[0] = '\0';
-        len =read(_socket, block, 256);
+        len = read(_socket, block, 256);
         if(len != 0)
             res+=block;
         else{
-            throw SocketException("[system recv error][server disconnected]");
-            
+            throw SocketException("[recv error: client disconnected]");
         }
     }while(res.find("]]]") == std::string::npos);
     
@@ -68,7 +64,9 @@ std::string Socket::recv(){
     //extract end of message
     std::string::size_type pos = res.find("]]]");
     res = res.substr(0,pos);
+    
     return res;
+    
 }
 
 

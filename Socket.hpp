@@ -25,7 +25,6 @@ public:
     Socket(std::string ip , int port);
     Socket(int Socket);
     
-    
     void send (std::string msg);
     std::string recv(void);
     void close(void);
