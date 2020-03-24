@@ -17,6 +17,8 @@
 #include <thread>
 #include <map>
 #include <vector>
+#include <mutex>
+
 using namespace std;
 
 
@@ -30,20 +32,16 @@ struct Client{
 class Server{
 private:
     int _serversocket;
-    thread *pushmap;
     sockaddr_in _addr;
     socklen_t _len;
-    fd_set _fdSet;
     map<int,Client*>*_clients;
     int _minFD ,_maxFD;
-    map<int,std::thread*>*_threads;
 public:
     Server(int serversocket,sockaddr_in addr,socklen_t len);
     void addClient(int sock,Client *client);
     void deleteClient(int sock,sockaddr_in addr,socklen_t len);
-    void broadcastToOthers(int emitterfd,map<int,Client*> *clients,string msg);
+    void broadcastToOthers(int emitterfd,map<int,Client*> *clients,string msg,std::mutex *mtx);
     void run(void);
-    thread *get_pushmap();
 };
 
 #endif /* Server_hpp */
